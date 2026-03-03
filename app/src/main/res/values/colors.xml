@@ -2,4 +2,11 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primary_blue">#2196F3</color>
+    <color name="primary_variant_blue">#1976D2</color>
+    <color name="secondary_blue">#BBDEFB</color>
+    <color name="background_light">#F5F9FF</color>
+    <color name="text_main">#1A237E</color>
+    <color name="accent_blue">#00BCD4</color>
+    <color name="goal_reached">#4CAF50</color>
 </resources>

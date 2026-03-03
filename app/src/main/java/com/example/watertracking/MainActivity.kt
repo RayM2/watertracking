@@ -31,6 +31,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var textViewGoalStatus: TextView
     private lateinit var progressBarGoal: ProgressBar
+    private lateinit var textViewAverage: TextView
+    private lateinit var textViewTotalEntries: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +46,6 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // Load goal from SharedPreferences
         val prefs = getSharedPreferences("WaterTrackingPrefs", Context.MODE_PRIVATE)
         hydrationGoal = prefs.getInt("hydration_goal", 2000)
 
@@ -61,8 +62,9 @@ class MainActivity : AppCompatActivity() {
         textViewGoalStatus = findViewById(R.id.textViewGoalStatus)
         progressBarGoal = findViewById(R.id.progressBarGoal)
         val buttonEditGoal = findViewById<Button>(R.id.buttonEditGoal)
+        textViewAverage = findViewById(R.id.textViewAverage)
+        textViewTotalEntries = findViewById(R.id.textViewTotalEntries)
 
-        // Set up drink types spinner
         val drinkTypes = arrayOf("Water", "Juice", "Alcohol", "Milk", "Tea/Coffee", "Soda", "Other")
         val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, drinkTypes)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -92,12 +94,12 @@ class MainActivity : AppCompatActivity() {
             database.waterDao().getAllEntries().collect { entries ->
                 waterAdapter.submitList(entries)
                 updateGoalProgress(entries)
+                updateTrends(entries)
             }
         }
     }
 
     private fun updateGoalProgress(entries: List<WaterEntry>) {
-        // Calculate total for today only
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.HOUR_OF_DAY, 0)
         calendar.set(Calendar.MINUTE, 0)
@@ -110,6 +112,31 @@ class MainActivity : AppCompatActivity() {
         textViewGoalStatus.text = "$totalToday / $hydrationGoal ml today"
         progressBarGoal.max = hydrationGoal
         progressBarGoal.progress = totalToday
+    }
+
+    private fun updateTrends(entries: List<WaterEntry>) {
+        if (entries.isEmpty()) {
+            textViewAverage.text = "0 ml"
+            textViewTotalEntries.text = "0"
+            return
+        }
+
+        // Calculate average per day for days with entries
+        val entriesByDay = entries.groupBy {
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = it.timestamp
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
+            cal.timeInMillis
+        }
+
+        val dailySums = entriesByDay.map { (_, dayEntries) -> dayEntries.sumOf { it.amount } }
+        val average = dailySums.average().toInt()
+
+        textViewAverage.text = "$average ml"
+        textViewTotalEntries.text = entries.size.toString()
     }
 
     private fun showEditGoalDialog() {
@@ -125,12 +152,9 @@ class MainActivity : AppCompatActivity() {
             val goalText = input.text.toString()
             if (goalText.isNotEmpty()) {
                 hydrationGoal = goalText.toInt()
-                
-                // Save to SharedPreferences
                 val prefs = getSharedPreferences("WaterTrackingPrefs", Context.MODE_PRIVATE)
                 prefs.edit().putInt("hydration_goal", hydrationGoal).apply()
 
-                // Update UI immediately
                 lifecycleScope.launch {
                     val entries = database.waterDao().getAllEntries().first()
                     updateGoalProgress(entries)
