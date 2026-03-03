@@ -1,10 +1,10 @@
-# Android Project 5 - *Name of App Here*
+# Android Project 5 - Hydration Tracker
 
-Submitted by: **Your Name Here**
+Submitted by: Rayhan Mohammed
 
-**Name of your app** is a health metrics app that allows users to track ... [TODO] 
+Hydration Tracker is a health metrics app that allows users to track their total hydration for the day, while setting goals and viewing hydration trends
 
-Time spent: **X** hours spent in total
+Time spent: 7 hours spent in total
 
 ## Required Features
 
@@ -31,10 +31,10 @@ The following **additional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://imgur.com/a/fsrEDzN' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+https://imgur.com/a/fsrEDzN.gif
 
 <!-- Replace this with whatever GIF tool you used! -->
-GIF created with ...  
+GIF created with CloudConvert and Imgur
 <!-- Recommended tools:
 [Kap](https://getkap.co/) for macOS
 [ScreenToGif](https://www.screentogif.com/) for Windows
